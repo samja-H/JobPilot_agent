@@ -14,6 +14,12 @@ llm:
   provider: openai
   model: gpt-4o-mini
   temperature: 0.2
+  max_tokens: 1200
+
+matching:
+  skill_weight: 0.4
+  project_weight: 0.35
+  keyword_weight: 0.25
 
 embedding:
   provider: mock

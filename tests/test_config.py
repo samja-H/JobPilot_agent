@@ -14,6 +14,10 @@ def test_load_settings_uses_default_values_when_files_are_missing(tmp_path: Path
 
     assert settings.app.name == "JobPilot-Agent"
     assert settings.server.port == 8000
+    assert settings.llm.max_tokens == 1200
+    assert settings.matching.skill_weight == 0.4
+    assert settings.matching.project_weight == 0.35
+    assert settings.matching.keyword_weight == 0.25
     assert settings.database.sqlite_path == "data/jobpilot.db"
     assert settings.embedding.provider == "mock"
     assert settings.embedding.dimension == 384
@@ -35,6 +39,11 @@ server:
   port: 8100
 llm:
   model: yaml-model
+  max_tokens: 900
+matching:
+  skill_weight: 0.5
+  project_weight: 0.3
+  keyword_weight: 0.2
 rag:
   top_k: 3
   score_threshold: 0.3
@@ -62,7 +71,9 @@ AGENT_ALLOWED_TOOLS=jd_analyzer,resume_matcher
         environ={
             "APP_DEBUG": "true",
             "EMBEDDING_DIMENSION": "32",
+            "LLM_MAX_TOKENS": "1100",
             "LLM_MODEL": "system-env-model",
+            "MATCHING_SKILL_WEIGHT": "0.6",
             "RAG_TOP_K": "7",
             "QDRANT_TIMEOUT": "8.0",
         },
@@ -73,6 +84,10 @@ AGENT_ALLOWED_TOOLS=jd_analyzer,resume_matcher
     assert settings.app.debug is True
     assert settings.server.port == 8200
     assert settings.llm.model == "system-env-model"
+    assert settings.llm.max_tokens == 1100
+    assert settings.matching.skill_weight == 0.6
+    assert settings.matching.project_weight == 0.3
+    assert settings.matching.keyword_weight == 0.2
     assert settings.embedding.dimension == 32
     assert settings.rag.top_k == 7
     assert settings.rag.score_threshold == 0.3
@@ -101,3 +116,10 @@ def test_load_settings_reads_rag_qdrant_embedding_options_from_app_yaml() -> Non
     assert settings.embedding.provider == "mock"
     assert settings.embedding.model == "mock-embedding"
     assert settings.embedding.dimension == 384
+    assert settings.llm.provider == "openai"
+    assert settings.llm.model == "gpt-4o-mini"
+    assert settings.llm.temperature == 0.2
+    assert settings.llm.max_tokens == 1200
+    assert settings.matching.skill_weight == 0.4
+    assert settings.matching.project_weight == 0.35
+    assert settings.matching.keyword_weight == 0.25

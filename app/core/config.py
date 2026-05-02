@@ -34,6 +34,13 @@ class LLMConfig(BaseModel):
     provider: str = "openai"
     model: str = "gpt-4o-mini"
     temperature: float = 0.2
+    max_tokens: int = 1200
+
+
+class MatchingConfig(BaseModel):
+    skill_weight: float = 0.4
+    project_weight: float = 0.35
+    keyword_weight: float = 0.25
 
 
 class EmbeddingConfig(BaseModel):
@@ -83,6 +90,7 @@ class Settings(BaseModel):
     server: ServerConfig = Field(default_factory=ServerConfig)
     frontend: FrontendConfig = Field(default_factory=FrontendConfig)
     llm: LLMConfig = Field(default_factory=LLMConfig)
+    matching: MatchingConfig = Field(default_factory=MatchingConfig)
     embedding: EmbeddingConfig = Field(default_factory=EmbeddingConfig)
     rag: RAGConfig = Field(default_factory=RAGConfig)
     qdrant: QdrantConfig = Field(default_factory=QdrantConfig)
@@ -110,6 +118,10 @@ ENV_KEY_MAP: dict[str, EnvPath] = {
     "LLM_PROVIDER": ("llm", "provider"),
     "LLM_MODEL": ("llm", "model"),
     "LLM_TEMPERATURE": ("llm", "temperature"),
+    "LLM_MAX_TOKENS": ("llm", "max_tokens"),
+    "MATCHING_SKILL_WEIGHT": ("matching", "skill_weight"),
+    "MATCHING_PROJECT_WEIGHT": ("matching", "project_weight"),
+    "MATCHING_KEYWORD_WEIGHT": ("matching", "keyword_weight"),
     "EMBEDDING_PROVIDER": ("embedding", "provider"),
     "EMBEDDING_MODEL": ("embedding", "model"),
     "EMBEDDING_DIMENSION": ("embedding", "dimension"),
