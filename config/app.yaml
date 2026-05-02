@@ -16,18 +16,22 @@ llm:
   temperature: 0.2
 
 embedding:
-  provider: openai
-  model: text-embedding-3-small
+  provider: mock
+  model: mock-embedding
+  dimension: 384
 
 rag:
   chunk_size: 800
   chunk_overlap: 120
   top_k: 5
+  score_threshold: 0.0
+  enable_rerank: false
 
 qdrant:
   host: localhost
   port: 6333
   collection_name: jobpilot_documents
+  timeout: 10.0
 
 database:
   type: sqlite

@@ -37,20 +37,24 @@ class LLMConfig(BaseModel):
 
 
 class EmbeddingConfig(BaseModel):
-    provider: str = "openai"
-    model: str = "text-embedding-3-small"
+    provider: str = "mock"
+    model: str = "mock-embedding"
+    dimension: int = 384
 
 
 class RAGConfig(BaseModel):
     chunk_size: int = 800
     chunk_overlap: int = 120
     top_k: int = 5
+    score_threshold: float | None = 0.0
+    enable_rerank: bool = False
 
 
 class QdrantConfig(BaseModel):
     host: str = "localhost"
     port: int = 6333
     collection_name: str = "jobpilot_documents"
+    timeout: float = 10.0
 
 
 class DatabaseConfig(BaseModel):
@@ -108,12 +112,16 @@ ENV_KEY_MAP: dict[str, EnvPath] = {
     "LLM_TEMPERATURE": ("llm", "temperature"),
     "EMBEDDING_PROVIDER": ("embedding", "provider"),
     "EMBEDDING_MODEL": ("embedding", "model"),
+    "EMBEDDING_DIMENSION": ("embedding", "dimension"),
     "RAG_CHUNK_SIZE": ("rag", "chunk_size"),
     "RAG_CHUNK_OVERLAP": ("rag", "chunk_overlap"),
     "RAG_TOP_K": ("rag", "top_k"),
+    "RAG_SCORE_THRESHOLD": ("rag", "score_threshold"),
+    "RAG_ENABLE_RERANK": ("rag", "enable_rerank"),
     "QDRANT_HOST": ("qdrant", "host"),
     "QDRANT_PORT": ("qdrant", "port"),
     "QDRANT_COLLECTION_NAME": ("qdrant", "collection_name"),
+    "QDRANT_TIMEOUT": ("qdrant", "timeout"),
     "DATABASE_TYPE": ("database", "type"),
     "DATABASE_SQLITE_PATH": ("database", "sqlite_path"),
     "LOGGING_LEVEL": ("logging", "level"),

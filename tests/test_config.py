@@ -15,6 +15,11 @@ def test_load_settings_uses_default_values_when_files_are_missing(tmp_path: Path
     assert settings.app.name == "JobPilot-Agent"
     assert settings.server.port == 8000
     assert settings.database.sqlite_path == "data/jobpilot.db"
+    assert settings.embedding.provider == "mock"
+    assert settings.embedding.dimension == 384
+    assert settings.rag.score_threshold == 0.0
+    assert settings.rag.enable_rerank is False
+    assert settings.qdrant.timeout == 10.0
 
 
 def test_load_settings_priority_yaml_env_file_system_env(tmp_path: Path) -> None:
@@ -32,6 +37,12 @@ llm:
   model: yaml-model
 rag:
   top_k: 3
+  score_threshold: 0.3
+  enable_rerank: true
+embedding:
+  dimension: 16
+qdrant:
+  timeout: 3.5
 """.strip(),
         encoding="utf-8",
     )
@@ -50,8 +61,10 @@ AGENT_ALLOWED_TOOLS=jd_analyzer,resume_matcher
         env_file=env_file,
         environ={
             "APP_DEBUG": "true",
+            "EMBEDDING_DIMENSION": "32",
             "LLM_MODEL": "system-env-model",
             "RAG_TOP_K": "7",
+            "QDRANT_TIMEOUT": "8.0",
         },
     )
 
@@ -60,6 +73,31 @@ AGENT_ALLOWED_TOOLS=jd_analyzer,resume_matcher
     assert settings.app.debug is True
     assert settings.server.port == 8200
     assert settings.llm.model == "system-env-model"
+    assert settings.embedding.dimension == 32
     assert settings.rag.top_k == 7
+    assert settings.rag.score_threshold == 0.3
+    assert settings.rag.enable_rerank is True
+    assert settings.qdrant.timeout == 8.0
     assert settings.secrets.secret_key == "env-file-secret"
     assert settings.agent.allowed_tools == ["jd_analyzer", "resume_matcher"]
+
+
+def test_load_settings_reads_rag_qdrant_embedding_options_from_app_yaml() -> None:
+    settings = load_settings(
+        config_path=Path("config/app.yaml"),
+        env_file=Path("missing.env"),
+        environ={},
+    )
+
+    assert settings.rag.chunk_size == 800
+    assert settings.rag.chunk_overlap == 120
+    assert settings.rag.top_k == 5
+    assert settings.rag.score_threshold == 0.0
+    assert settings.rag.enable_rerank is False
+    assert settings.qdrant.host == "localhost"
+    assert settings.qdrant.port == 6333
+    assert settings.qdrant.collection_name == "jobpilot_documents"
+    assert settings.qdrant.timeout == 10.0
+    assert settings.embedding.provider == "mock"
+    assert settings.embedding.model == "mock-embedding"
+    assert settings.embedding.dimension == 384
