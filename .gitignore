@@ -5,6 +5,6 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-jobpilot.db
-qdrant_storage/
-
+.DS_Store
+logs/
+data/

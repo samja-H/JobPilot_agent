@@ -1,2 +1,1 @@
-"""JobPilot Agent application package."""
-
+"""JobPilot-Agent application package."""

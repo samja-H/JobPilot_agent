@@ -9,4 +9,3 @@ class HealthResponse(BaseModel):
     status: Literal["ok"]
     app_name: str
     environment: str
-

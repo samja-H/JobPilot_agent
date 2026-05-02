@@ -1,56 +1,45 @@
 from __future__ import annotations
 
-import json
-import os
-import urllib.error
-import urllib.request
+import sys
+from pathlib import Path
 from typing import Any
 
 import streamlit as st
 
-DEFAULT_API_URL: str = "http://localhost:8000"
+ROOT_DIR: Path = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.append(str(ROOT_DIR))
 
-
-def fetch_health(api_url: str) -> dict[str, Any]:
-    url: str = f"{api_url.rstrip('/')}/health"
-    request: urllib.request.Request = urllib.request.Request(
-        url,
-        headers={"Accept": "application/json"},
-    )
-
-    with urllib.request.urlopen(request, timeout=5) as response:
-        body: str = response.read().decode("utf-8")
-
-    payload: Any = json.loads(body)
-    if not isinstance(payload, dict):
-        raise ValueError("Unexpected health response payload.")
-
-    return payload
+from app.core.config import get_settings  # noqa: E402
 
 
 def main() -> None:
-    st.set_page_config(page_title="JobPilot Agent")
-    st.title("JobPilot Agent")
+    settings = get_settings()
+    runtime_config: dict[str, Any] = {
+        "app": {
+            "name": settings.app.name,
+            "env": settings.app.env,
+            "debug": settings.app.debug,
+        },
+        "backend": {
+            "host": settings.server.host,
+            "port": settings.server.port,
+        },
+        "qdrant": {
+            "host": settings.qdrant.host,
+            "port": settings.qdrant.port,
+            "collection": settings.qdrant.collection_name,
+        },
+        "database": {
+            "type": settings.database.type,
+            "sqlite_path": settings.database.sqlite_path,
+        },
+    }
 
-    api_url: str = st.text_input(
-        "FastAPI URL",
-        value=os.getenv("JOBPILOT_API_URL", DEFAULT_API_URL),
-    )
-
-    if st.button("Check backend"):
-        try:
-            health: dict[str, Any] = fetch_health(api_url)
-        except (
-            TimeoutError,
-            ValueError,
-            json.JSONDecodeError,
-            urllib.error.URLError,
-        ) as exc:
-            st.error(f"Backend health check failed: {exc}")
-            return
-
-        st.success("Backend is healthy.")
-        st.json(health)
+    st.set_page_config(page_title=settings.app.name, page_icon="JP", layout="wide")
+    st.title(settings.app.name)
+    st.caption("Minimal Streamlit demo for the JobPilot-Agent backend skeleton.")
+    st.json(runtime_config)
 
 
 if __name__ == "__main__":

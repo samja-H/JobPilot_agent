@@ -1,2 +1,1 @@
-"""Agent graph and orchestration components."""
-
+"""Agent workflow package placeholder."""

@@ -1,2 +1,1 @@
-"""Tool functions exposed to the agent workflow."""
-
+"""Tool package placeholder."""

@@ -14,7 +14,6 @@ router: APIRouter = APIRouter(tags=["health"])
 def health_check(settings: Annotated[Settings, Depends(get_settings)]) -> HealthResponse:
     return HealthResponse(
         status="ok",
-        app_name=settings.app_name,
-        environment=settings.environment,
+        app_name=settings.app.name,
+        environment=settings.app.env,
     )
-

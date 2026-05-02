@@ -1,0 +1,45 @@
+app:
+  name: JobPilot-Agent
+  env: local
+  debug: false
+
+server:
+  host: 0.0.0.0
+  port: 8000
+
+frontend:
+  port: 8501
+
+llm:
+  provider: openai
+  model: gpt-4o-mini
+  temperature: 0.2
+
+embedding:
+  provider: openai
+  model: text-embedding-3-small
+
+rag:
+  chunk_size: 800
+  chunk_overlap: 120
+  top_k: 5
+
+qdrant:
+  host: localhost
+  port: 6333
+  collection_name: jobpilot_documents
+
+database:
+  type: sqlite
+  sqlite_path: data/jobpilot.db
+
+logging:
+  level: INFO
+  log_file: logs/jobpilot.log
+
+agent:
+  allowed_tools:
+    - jd_analyzer
+    - resume_matcher
+    - resume_optimizer
+    - interview_question_generator

@@ -1,2 +1,1 @@
-"""RAG components for future document indexing and retrieval."""
-
+"""RAG package placeholder."""

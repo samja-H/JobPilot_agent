@@ -1,2 +1,1 @@
-"""SQLite database models and repositories."""
-
+"""Database package placeholder."""

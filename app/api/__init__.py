@@ -1,2 +1,1 @@
-"""HTTP API routes."""
-
+"""API route package."""

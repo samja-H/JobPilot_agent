@@ -1,2 +1,1 @@
-"""Core configuration and runtime helpers."""
-
+"""Core application utilities."""
