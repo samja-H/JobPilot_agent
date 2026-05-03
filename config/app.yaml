@@ -9,6 +9,7 @@ server:
 
 frontend:
   port: 8501
+  backend_url: http://localhost:8000
 
 llm:
   provider: openai

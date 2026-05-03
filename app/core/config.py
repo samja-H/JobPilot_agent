@@ -28,6 +28,7 @@ class ServerConfig(BaseModel):
 
 class FrontendConfig(BaseModel):
     port: int = 8501
+    backend_url: str = "http://localhost:8000"
 
 
 class LLMConfig(BaseModel):
@@ -117,6 +118,7 @@ ENV_KEY_MAP: dict[str, EnvPath] = {
     "SERVER_HOST": ("server", "host"),
     "SERVER_PORT": ("server", "port"),
     "FRONTEND_PORT": ("frontend", "port"),
+    "FRONTEND_BACKEND_URL": ("frontend", "backend_url"),
     "LLM_PROVIDER": ("llm", "provider"),
     "LLM_MODEL": ("llm", "model"),
     "LLM_TEMPERATURE": ("llm", "temperature"),

@@ -14,6 +14,8 @@ def test_load_settings_uses_default_values_when_files_are_missing(tmp_path: Path
 
     assert settings.app.name == "JobPilot-Agent"
     assert settings.server.port == 8000
+    assert settings.frontend.port == 8501
+    assert settings.frontend.backend_url == "http://localhost:8000"
     assert settings.llm.max_tokens == 1200
     assert settings.matching.skill_weight == 0.4
     assert settings.matching.project_weight == 0.35
@@ -39,6 +41,8 @@ app:
   env: test
 server:
   port: 8100
+frontend:
+  backend_url: http://yaml-backend:8000
 llm:
   model: yaml-model
   max_tokens: 900
@@ -80,6 +84,7 @@ AGENT_ALLOWED_TOOLS=jd_analyzer,resume_matcher
             "QDRANT_TIMEOUT": "8.0",
             "AGENT_MAX_ITERATIONS": "5",
             "AGENT_ENABLE_TOOL_CALLING": "false",
+            "FRONTEND_BACKEND_URL": "http://system-backend:9000",
         },
     )
 
@@ -87,6 +92,7 @@ AGENT_ALLOWED_TOOLS=jd_analyzer,resume_matcher
     assert settings.app.env == "test"
     assert settings.app.debug is True
     assert settings.server.port == 8200
+    assert settings.frontend.backend_url == "http://system-backend:9000"
     assert settings.llm.model == "system-env-model"
     assert settings.llm.max_tokens == 1100
     assert settings.matching.skill_weight == 0.6
@@ -126,6 +132,7 @@ def test_load_settings_reads_rag_qdrant_embedding_options_from_app_yaml() -> Non
     assert settings.llm.model == "gpt-4o-mini"
     assert settings.llm.temperature == 0.2
     assert settings.llm.max_tokens == 1200
+    assert settings.frontend.backend_url == "http://localhost:8000"
     assert settings.matching.skill_weight == 0.4
     assert settings.matching.project_weight == 0.35
     assert settings.matching.keyword_weight == 0.25
