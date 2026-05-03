@@ -48,8 +48,12 @@ logging:
   log_file: logs/jobpilot.log
 
 agent:
+  max_iterations: 3
+  enable_tool_calling: true
   allowed_tools:
     - jd_analyzer
     - resume_matcher
-    - resume_optimizer
+    - resume_rewriter
     - interview_question_generator
+    - application_tracker
+    - rag_retriever

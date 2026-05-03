@@ -238,8 +238,8 @@ def _infer_job_category(skills: list[str], jd_text: str) -> str:
     for category, category_skills in CATEGORY_KEYWORDS.items():
         scores[category] += sum(1 for skill in category_skills if skill in skills)
 
-    if any(keyword in normalized_text for keyword in ("大模型", "llm", "rag", "langchain", "langgraph")):
-        scores["AI / RAG 应用"] += 2
+    if any(keyword in normalized_text for keyword in ("ai", "大模型", "llm", "rag", "langchain", "langgraph")):
+        scores["AI / RAG 应用"] += 3
     if any(keyword in normalized_text for keyword in ("后端", "backend", "api", "服务端")):
         scores["后端开发"] += 2
     if any(keyword in normalized_text for keyword in ("前端", "frontend", "react", "vue")):

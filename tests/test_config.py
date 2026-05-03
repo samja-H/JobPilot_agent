@@ -24,6 +24,8 @@ def test_load_settings_uses_default_values_when_files_are_missing(tmp_path: Path
     assert settings.rag.score_threshold == 0.0
     assert settings.rag.enable_rerank is False
     assert settings.qdrant.timeout == 10.0
+    assert settings.agent.max_iterations == 3
+    assert settings.agent.enable_tool_calling is True
 
 
 def test_load_settings_priority_yaml_env_file_system_env(tmp_path: Path) -> None:
@@ -76,6 +78,8 @@ AGENT_ALLOWED_TOOLS=jd_analyzer,resume_matcher
             "MATCHING_SKILL_WEIGHT": "0.6",
             "RAG_TOP_K": "7",
             "QDRANT_TIMEOUT": "8.0",
+            "AGENT_MAX_ITERATIONS": "5",
+            "AGENT_ENABLE_TOOL_CALLING": "false",
         },
     )
 
@@ -95,6 +99,8 @@ AGENT_ALLOWED_TOOLS=jd_analyzer,resume_matcher
     assert settings.qdrant.timeout == 8.0
     assert settings.secrets.secret_key == "env-file-secret"
     assert settings.agent.allowed_tools == ["jd_analyzer", "resume_matcher"]
+    assert settings.agent.max_iterations == 5
+    assert settings.agent.enable_tool_calling is False
 
 
 def test_load_settings_reads_rag_qdrant_embedding_options_from_app_yaml() -> None:
@@ -123,3 +129,13 @@ def test_load_settings_reads_rag_qdrant_embedding_options_from_app_yaml() -> Non
     assert settings.matching.skill_weight == 0.4
     assert settings.matching.project_weight == 0.35
     assert settings.matching.keyword_weight == 0.25
+    assert settings.agent.max_iterations == 3
+    assert settings.agent.enable_tool_calling is True
+    assert settings.agent.allowed_tools == [
+        "jd_analyzer",
+        "resume_matcher",
+        "resume_rewriter",
+        "interview_question_generator",
+        "application_tracker",
+        "rag_retriever",
+    ]

@@ -76,6 +76,8 @@ class LoggingConfig(BaseModel):
 
 class AgentConfig(BaseModel):
     allowed_tools: list[str] = Field(default_factory=list)
+    max_iterations: int = 3
+    enable_tool_calling: bool = True
 
 
 class SecretConfig(BaseModel):
@@ -139,6 +141,8 @@ ENV_KEY_MAP: dict[str, EnvPath] = {
     "LOGGING_LEVEL": ("logging", "level"),
     "LOGGING_LOG_FILE": ("logging", "log_file"),
     "AGENT_ALLOWED_TOOLS": ("agent", "allowed_tools"),
+    "AGENT_MAX_ITERATIONS": ("agent", "max_iterations"),
+    "AGENT_ENABLE_TOOL_CALLING": ("agent", "enable_tool_calling"),
     "OPENAI_API_KEY": ("secrets", "openai_api_key"),
     "DASHSCOPE_API_KEY": ("secrets", "dashscope_api_key"),
     "DEEPSEEK_API_KEY": ("secrets", "deepseek_api_key"),
