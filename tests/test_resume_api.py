@@ -51,3 +51,31 @@ def test_resume_match_route_rejects_empty_input() -> None:
 
     assert response.status_code == 400
     assert response.json()["detail"] == "resume_text and jd_text must not be empty"
+
+
+def test_resume_rewrite_route_returns_template_result() -> None:
+    settings = Settings(
+        app=AppConfig(name="Test JobPilot", env="test", debug=False),
+        logging=LoggingConfig(level="CRITICAL", log_file=None),
+    )
+    app: FastAPI = create_app(settings)
+    client = TestClient(app)
+
+    response = client.post(
+        "/resume/rewrite",
+        json={
+            "resume_text": "熟悉 Python、FastAPI 和 RAG 应用开发。",
+            "project_experience": "项目：负责使用 FastAPI 搭建 RAG 检索服务。",
+            "jd_text": "要求：Python、FastAPI、RAG、Qdrant。",
+            "rag_context": ["历史项目中使用 Qdrant 做向量检索。"],
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["analysis_mode"] == "rules"
+    assert "FastAPI" in payload["skill_keywords"]
+    assert payload["optimized_project_description"]
+    assert payload["bullet_points"]
+    assert payload["highlight_points"]
+    assert payload["risk_warnings"]

@@ -5,8 +5,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.config import Settings, get_settings
-from app.schemas.resume import ResumeMatchRequest, ResumeMatchResponse
+from app.schemas.resume import (
+    ResumeMatchRequest,
+    ResumeMatchResponse,
+    ResumeRewriteRequest,
+    ResumeRewriteResponse,
+)
 from app.tools.resume_matcher import match_resume_to_jd_tool
+from app.tools.resume_rewriter import rewrite_resume_project_tool
 
 router: APIRouter = APIRouter(prefix="/resume", tags=["resume"])
 
@@ -18,6 +24,20 @@ def match_resume(
 ) -> ResumeMatchResponse:
     try:
         return match_resume_to_jd_tool(request=request, settings=settings)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+
+@router.post("/rewrite", response_model=ResumeRewriteResponse)
+def rewrite_resume(
+    request: ResumeRewriteRequest,
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> ResumeRewriteResponse:
+    try:
+        return rewrite_resume_project_tool(request=request, settings=settings)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
