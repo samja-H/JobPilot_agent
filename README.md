@@ -2,7 +2,7 @@
 
 JobPilot-Agent 是一个面向求职场景的智能 Agent 项目，目标是基于 RAG 与 Tool Calling 构建岗位分析、简历匹配、简历优化、面试准备和投递记录管理的一体化求职助手。
 
-当前仓库处于 MVP 骨架阶段，已经具备 FastAPI 后端、Streamlit Demo、Qdrant 服务、SQLite 配置、统一配置加载和健康检查接口。RAG、Agent 工作流和具体业务工具会在后续迭代中按模块逐步实现。
+当前仓库处于 MVP 演示阶段，已经具备 FastAPI 后端、Streamlit Demo、Qdrant 服务、SQLite 投递记录、统一配置加载、结构化日志、统一异常处理和最小 LangGraph Agent 工作流。
 
 ## 核心功能
 
@@ -11,7 +11,8 @@ JobPilot-Agent 是一个面向求职场景的智能 Agent 项目，目标是基�
 - 简历优化建议：针对 JD 给出简历 bullet 优化方向，突出技能、项目和成果。
 - 面试问题生成：根据 JD、简历和匹配结果生成技术面、行为面和项目深挖问题。
 - 投递记录管理：记录岗位、公司、状态、时间线和备注，支持后续追踪。
-- 最小可运行闭环：提供 `/health` 接口、Streamlit Demo、Qdrant Docker Compose 和配置加载测试。
+- Agent 对话：根据用户输入显式识别意图，并调用白名单内工具。
+- 最小可运行闭环：提供 `/health` 接口、Streamlit Demo、Qdrant Docker Compose、启动脚本和 pytest 测试。
 
 ## 技术栈
 
@@ -65,6 +66,9 @@ Qdrant + SQLite + LLM Provider
 │   └── app.yaml          # 非敏感配置
 ├── frontend/
 │   └── streamlit_app.py  # Streamlit Demo
+├── scripts/
+│   ├── run_server.py     # 读取 app.yaml 启动 FastAPI
+│   └── run_frontend.py   # 读取 app.yaml 启动 Streamlit
 ├── tests/                # pytest 测试
 ├── docs/                 # 系统设计文档
 ├── docker-compose.yml    # Qdrant 等基础服务
@@ -82,13 +86,13 @@ Qdrant + SQLite + LLM Provider
 
 `config/app.yaml` 保存非敏感配置，包括：
 
-- 端口：`server.host`、`server.port`、`frontend.port`
+- 端口和前端后端地址：`server.host`、`server.port`、`frontend.port`、`frontend.backend_url`
 - 模型名称：`llm.provider`、`llm.model`、`embedding.provider`、`embedding.model`
 - RAG 参数：`rag.chunk_size`、`rag.chunk_overlap`、`rag.top_k`
 - Qdrant 地址：`qdrant.host`、`qdrant.port`、`qdrant.collection_name`
 - SQLite 路径：`database.type`、`database.sqlite_path`
 - 日志配置：`logging.level`、`logging.log_file`
-- Agent 工具白名单：`agent.allowed_tools`
+- Agent 配置：`agent.allowed_tools`、`agent.max_iterations`、`agent.enable_tool_calling`
 
 `.env` 保存敏感配置，包括：
 
@@ -125,10 +129,22 @@ docker compose up -d qdrant
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
+或使用读取 `config/app.yaml` 的启动脚本：
+
+```bash
+python scripts/run_server.py
+```
+
 启动前端：
 
 ```bash
 streamlit run frontend/streamlit_app.py --server.port 8501
+```
+
+或使用读取 `config/app.yaml` 的启动脚本：
+
+```bash
+python scripts/run_frontend.py
 ```
 
 运行测试：
@@ -136,6 +152,24 @@ streamlit run frontend/streamlit_app.py --server.port 8501
 ```bash
 python -m pytest
 ```
+
+常用本地验证命令：
+
+```bash
+python -m compileall app frontend scripts tests
+python -m pytest tests/test_config.py tests/test_splitter.py tests/test_embeddings.py
+python -m pytest tests/test_jd_analyzer.py tests/test_resume_matcher.py tests/test_agent_workflow.py
+```
+
+如果当前 Python 环境尚未安装 FastAPI，API 相关测试会在收集阶段报 `ModuleNotFoundError: No module named 'fastapi'`。先执行 `python -m pip install -e ".[dev]"` 再运行全量测试。
+
+## 工程化说明
+
+- 统一异常处理位于 `app/core/exceptions.py`，FastAPI 创建时自动注册 handler。
+- 结构化日志位于 `app/core/logging.py`，输出 JSON 格式日志。
+- 日志级别由 `logging.level` 控制。
+- 日志文件路径由 `logging.log_file` 控制，默认写入 `logs/jobpilot.log`。
+- `.gitignore` 已忽略 `.env`、`logs/`、`data/`、`__pycache__/` 和 `.pytest_cache/`。
 
 ## API 说明
 
